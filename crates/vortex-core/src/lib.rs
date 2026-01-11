@@ -2,6 +2,7 @@
 //!
 //! This crate provides the foundational types for the Vortex Config server.
 
+/// Returns the crate version.
 pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
 }
@@ -24,6 +25,8 @@ mod tests {
     #[test]
     fn crate_compiles() {
         // Test implícito: si este test corre, el crate compila
-        assert!(true);
+        // Verificamos que la función version existe y retorna algo válido
+        let v = version();
+        assert!(!v.is_empty(), "Version should not be empty");
     }
 }
