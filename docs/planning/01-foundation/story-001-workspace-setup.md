@@ -4,11 +4,13 @@
 
 Vortex Config será un proyecto Rust con múltiples crates organizados en un workspace. Esta estructura es análoga a un proyecto Maven multi-módulo, pero con las ventajas del sistema de gestión de dependencias de Cargo.
 
+> **Contexto del PRD**: La arquitectura modular es fundamental para soportar las características diferenciadoras del servidor: PLAC (Property-Level Access Control), múltiples backends (Git, S3, SQL), feature flags nativos, y el motor de compliance. Cada crate representará una capa del sistema, facilitando testing aislado y compilación incremental.
+
 El objetivo es crear la estructura base del proyecto con tres crates iniciales:
 
-- **vortex-core**: Tipos y traits del dominio (librería)
-- **vortex-server**: Servidor HTTP (binario, futuro)
-- **vortex-sources**: Backends de configuración (librería, futuro)
+- **vortex-core**: Tipos y traits del dominio (librería) — Base para `ConfigMap`, `PropertySource`, traits como `ConfigSource` y `InheritanceResolver`
+- **vortex-server**: Servidor HTTP (binario, futuro) — Axum API, endpoints REST compatibles con Spring Cloud Config
+- **vortex-sources**: Backends de configuración (librería, futuro) — Implementaciones de Git (gix), S3 (aws-sdk), SQL (SQLx)
 
 ## Alcance
 
@@ -85,9 +87,14 @@ thiserror = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
+# Core async runtime (usado en todas las épicas futuras)
+tokio = { version = "1", features = ["full"] }
+
 # Crates internos
 vortex-core = { path = "crates/vortex-core" }
 ```
+
+> **Nota de arquitectura**: Este workspace crecerá para incluir los crates del PRD: `vortex-governance` (PLAC, schemas), `vortex-features` (feature flags), `vortex-rollout` (canary deployments), `vortex-audit` (event sourcing), `vortex-secrets` (Vault/AWS SM), `vortex-templating` (Tera), `vortex-federation` (multi-cluster), y `vortex-client` (SDK).
 
 ### Cargo.toml de vortex-core
 
@@ -407,6 +414,14 @@ cargo test --workspace
 # Verificar que cada crate se puede publicar (dry-run)
 cargo publish --dry-run -p vortex-core
 ```
+
+## KPIs Asociados (del PRD)
+
+| Métrica | Objetivo | Relevancia para esta historia |
+|---------|----------|-------------------------------|
+| Build time (debug) | < 30s | La estructura multi-crate permite compilación incremental |
+| Build time (release) | < 2min | Workspace optimiza rebuilds parciales |
+| Memory footprint | < 30MB | Base para medir overhead del servidor |
 
 ## Entregable Final
 

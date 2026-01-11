@@ -4,6 +4,14 @@
 
 El manejo de errores en Rust es fundamentalmente diferente a Java. En lugar de excepciones que se propagan implicitamente, Rust usa tipos `Result<T, E>` que fuerzan al programador a manejar los errores explicitamente.
 
+> **Contexto del PRD**: El sistema de errores debe ser extensible para soportar las características avanzadas:
+>
+> - **PLAC errors**: Acceso denegado a propiedad, redacción de valor sensible
+> - **Compliance errors**: Violaciones de PCI-DSS, SOC2, con severidad y remediación
+> - **Rollout errors**: Fallas de canary, criterios de éxito no cumplidos
+> - **Drift errors**: Configuración desincronizada entre instancias
+> - Los errores deben ser serializables para el sistema de **Event Sourcing** y audit trail
+
 Esta historia establece la jerarquia de errores del dominio de Vortex Config usando la libreria `thiserror`, que simplifica la creacion de tipos de error idiomaticos.
 
 Para un desarrollador Java, piensa en esto como crear una jerarquia de excepciones custom, pero donde el compilador te obliga a manejar cada posible error.
@@ -11,6 +19,7 @@ Para un desarrollador Java, piensa en esto como crear una jerarquia de excepcion
 ## Alcance
 
 ### In Scope
+
 - Definir enum `VortexError` con variantes para cada tipo de error
 - Implementar `std::error::Error` via thiserror
 - Crear type alias `Result<T>` para el proyecto
@@ -18,6 +27,7 @@ Para un desarrollador Java, piensa en esto como crear una jerarquia de excepcion
 - Documentar patrones de uso
 
 ### Out of Scope
+
 - Errores de red/HTTP (futuras epicas)
 - Logging/tracing de errores
 - Metricas de errores
@@ -56,6 +66,21 @@ VortexError
 ├── SourceError             # Error de backend/fuente
 └── ValidationError         # Error de validación
 ```
+
+> **Extensión futura (del PRD)**: En épicas posteriores, se agregarán variantes para:
+>
+> ```rust
+> // Errores de Governance (PLAC) - Épica 07
+> AccessDenied { principal: String, property: String, action: PlacAction },
+> PropertyRedacted { property: String, reason: String },
+>
+> // Errores de Compliance - Épica 09
+> ComplianceViolation { rule_id: String, severity: Severity, remediation: String },
+>
+> // Errores de Rollout - Épica 10
+> RolloutFailed { stage: String, reason: String, metrics: FailureMetrics },
+> DriftDetected { instance_id: String, expected_hash: u64, actual_hash: u64 },
+> ```
 
 ### Interfaces Propuestas
 
@@ -865,7 +890,7 @@ fn test_error_context_preservation() {
 
 ## Entregable Final
 
-### PR debe incluir:
+### PR debe incluir
 
 1. **Archivos nuevos/modificados:**
    - `crates/vortex-core/src/error.rs` (nuevo)
@@ -892,6 +917,14 @@ fn test_error_context_preservation() {
 - [ ] Doc comments con ejemplos ejecutables
 - [ ] No hay warnings de clippy
 - [ ] Integración con modelo de dominio (métodos que usan Result)
+
+## KPIs Asociados (del PRD)
+
+| Métrica | Objetivo | Relevancia para esta historia |
+|---------|----------|-------------------------------|
+| Errores tipados | 100% | Sin strings genéricos, todos con thiserror |
+| Error context | 100% | Todos los errores incluyen contexto útil |
+| Serializabilidad | Requerido | Errores deben poder serializarse para audit |
 
 ---
 
