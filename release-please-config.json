@@ -1,9 +1,11 @@
 {
-  "release-type": "rust-workspace",
+  "bootstrap-sha": "8042338a1c632f08e1ae390b05bf7d1ebf81e42b",
   "bump-minor-pre-major": true,
   "bump-patch-for-minor-pre-major": true,
-  "changelog-path": "CHANGELOG.md",
   "packages": {
-    ".": {}
+    ".": {
+      "release-type": "rust",
+      "changelog-path": "CHANGELOG.md"
+    }
   }
 }
