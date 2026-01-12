@@ -18,10 +18,10 @@ pub fn deep_merge(base: &mut ConfigMap, overlay: &ConfigMap) {
         match base.as_inner_mut().get_mut(key) {
             Some(base_val) => {
                 merge_values(base_val, overlay_val);
-            }
+            },
             None => {
                 base.insert(key.clone(), overlay_val.clone());
-            }
+            },
         }
     }
 }
@@ -33,17 +33,17 @@ fn merge_values(base: &mut ConfigValue, overlay: &ConfigValue) {
                 match base_map.get_mut(key) {
                     Some(base_inner_val) => {
                         merge_values(base_inner_val, overlay_inner_val);
-                    }
+                    },
                     None => {
                         base_map.insert(key.clone(), overlay_inner_val.clone());
-                    }
+                    },
                 }
             }
-        }
+        },
         // In all other cases (primitives, arrays, mixed types), overlay wins.
         (base_val, overlay_val) => {
             *base_val = overlay_val.clone();
-        }
+        },
     }
 }
 
@@ -66,7 +66,8 @@ mod tests {
 
     #[test]
     fn test_deep_merge_nested() {
-        let mut base = ConfigMap::from_json(r#"
+        let mut base = ConfigMap::from_json(
+            r#"
         {
             "server": {
                 "port": 8080,
@@ -74,9 +75,12 @@ mod tests {
             },
             "logging": "INFO"
         }
-        "#).unwrap();
+        "#,
+        )
+        .unwrap();
 
-        let overlay = ConfigMap::from_json(r#"
+        let overlay = ConfigMap::from_json(
+            r#"
         {
             "server": {
                 "host": "0.0.0.0",
@@ -86,7 +90,9 @@ mod tests {
                 "level": "DEBUG"
             }
         }
-        "#).unwrap();
+        "#,
+        )
+        .unwrap();
 
         deep_merge(&mut base, &overlay);
 

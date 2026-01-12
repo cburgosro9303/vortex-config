@@ -16,7 +16,8 @@ pub fn source(name: &str, priority: i32, json_content: &str) -> PropertySource {
 
 /// Returns a complex nested configuration fixture.
 pub fn complex_config() -> ConfigMap {
-    config_from_json(r#"{
+    config_from_json(
+        r#"{
         "server": {
             "port": 8080,
             "host": "localhost",
@@ -32,5 +33,6 @@ pub fn complex_config() -> ConfigMap {
             }
         },
         "features": ["new-ui", "beta-api"]
-    }"#)
+    }"#,
+    )
 }

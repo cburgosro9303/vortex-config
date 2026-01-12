@@ -50,7 +50,7 @@ mod tests {
     #[test]
     fn test_priority_order() {
         let mut list = PropertySourceList::new();
-        
+
         let mut t1 = ConfigMap::new();
         t1.insert("key", "low");
         list.add(PropertySource {
@@ -81,7 +81,7 @@ mod tests {
 
         // Expected order application: 10 (low) -> 50 (mid) -> 100 (high)
         // Final value should be "high"
-        
+
         let merged = list.merge();
         assert_eq!(merged.get("key").unwrap().as_str(), Some("high"));
     }

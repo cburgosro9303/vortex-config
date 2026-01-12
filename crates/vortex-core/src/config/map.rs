@@ -35,7 +35,7 @@ impl ConfigMap {
         &self.inner
     }
 
-     /// Returns a mutable reference to the internal map.
+    /// Returns a mutable reference to the internal map.
     pub fn as_inner_mut(&mut self) -> &mut IndexMap<String, ConfigValue> {
         &mut self.inner
     }
@@ -66,7 +66,7 @@ impl ConfigMap {
     /// ```
     pub fn get(&self, path: &str) -> Option<&ConfigValue> {
         if path.is_empty() {
-             return None;
+            return None;
         }
 
         // Fast path for simple keys
@@ -82,7 +82,7 @@ impl ConfigMap {
             match current_value {
                 ConfigValue::Object(map) => {
                     current_value = map.get(*part)?;
-                }
+                },
                 _ => return None,
             }
         }
@@ -92,22 +92,26 @@ impl ConfigMap {
 
     /// Parses a JSON string into a ConfigMap.
     pub fn from_json(json: &str) -> Result<Self> {
-        serde_json::from_str(json).map_err(|e| VortexError::parse_error("json_source", e.to_string()))
+        serde_json::from_str(json)
+            .map_err(|e| VortexError::parse_error("json_source", e.to_string()))
     }
 
     /// Serializes the map to a JSON string (pretty printed).
     pub fn to_json(&self) -> Result<String> {
-        serde_json::to_string_pretty(self).map_err(|e| VortexError::parse_error("json_target", e.to_string()))
+        serde_json::to_string_pretty(self)
+            .map_err(|e| VortexError::parse_error("json_target", e.to_string()))
     }
 
     /// Parses a YAML string into a ConfigMap.
     pub fn from_yaml(yaml: &str) -> Result<Self> {
-        serde_yaml::from_str(yaml).map_err(|e| VortexError::parse_error("yaml_source", e.to_string()))
+        serde_yaml::from_str(yaml)
+            .map_err(|e| VortexError::parse_error("yaml_source", e.to_string()))
     }
 
     /// Serializes the map to a YAML string.
     pub fn to_yaml(&self) -> Result<String> {
-        serde_yaml::to_string(self).map_err(|e| VortexError::parse_error("yaml_target", e.to_string()))
+        serde_yaml::to_string(self)
+            .map_err(|e| VortexError::parse_error("yaml_target", e.to_string()))
     }
 }
 
@@ -138,9 +142,15 @@ mod tests {
         let config = ConfigMap::from_json(json).unwrap();
 
         assert_eq!(config.get("server.port").unwrap().as_i64(), Some(8080));
-        assert_eq!(config.get("server.host").unwrap().as_str(), Some("localhost"));
-        assert_eq!(config.get("server.admin.enabled").unwrap().as_bool(), Some(true));
-        
+        assert_eq!(
+            config.get("server.host").unwrap().as_str(),
+            Some("localhost")
+        );
+        assert_eq!(
+            config.get("server.admin.enabled").unwrap().as_bool(),
+            Some(true)
+        );
+
         // Non-existent
         assert_eq!(config.get("server.ssl"), None);
         assert_eq!(config.get("server.port.sub"), None); // port is integer, not object

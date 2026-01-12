@@ -11,16 +11,16 @@ use serde::{Deserialize, Serialize};
 pub struct SpringConfigResponse {
     pub name: String,
     pub profiles: Vec<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version: Option<String>,
-    
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub state: Option<String>,
-    
+
     #[serde(rename = "propertySources")]
     pub property_sources: Vec<SpringPropertySource>,
 }
@@ -49,7 +49,7 @@ impl SpringConfigResponse {
         self.label = Some(label.into());
         self
     }
-    
+
     pub fn with_version(mut self, version: impl Into<String>) -> Self {
         self.version = Some(version.into());
         self
@@ -93,12 +93,12 @@ fn flatten_value(prefix: &str, value: &ConfigValue, target: &mut IndexMap<String
                 let new_key = format!("{}.{}", prefix, curr_key);
                 flatten_value(&new_key, curr_val, target);
             }
-        }
+        },
         // For Spring compatibility, arrays are often treated as values or indexed keys.
         // Here we treat array as a value (leaf) as per our planning decision.
         _ => {
             target.insert(prefix.to_string(), value.clone());
-        }
+        },
     }
 }
 
@@ -122,9 +122,12 @@ mod tests {
         let flat = flatten_config_map(&config);
 
         assert_eq!(flat.get("server.port").unwrap().as_i64(), Some(8080));
-        assert_eq!(flat.get("server.ssl.enabled").unwrap().as_bool(), Some(true));
+        assert_eq!(
+            flat.get("server.ssl.enabled").unwrap().as_bool(),
+            Some(true)
+        );
         assert_eq!(flat.get("app").unwrap().as_str(), Some("test"));
-        
+
         // Ensure intermediate keys shouldn't exist as separate entries
         assert!(flat.get("server").is_none());
         assert!(flat.get("server.ssl").is_none());
@@ -134,17 +137,17 @@ mod tests {
     fn test_spring_response_serialization() {
         let mut response = SpringConfigResponse::new("myapp", vec!["prod".into()]);
         response = response.with_version("v1");
-        
+
         let mut source_map = IndexMap::new();
         source_map.insert("key".into(), ConfigValue::String("value".into()));
-        
+
         response.property_sources.push(SpringPropertySource {
             name: "test.yml".into(),
             source: source_map,
         });
 
         let json = serde_json::to_string(&response).unwrap();
-        
+
         assert!(json.contains(r#""name":"myapp""#));
         assert!(json.contains(r#""propertySources""#)); // camelCase check
         assert!(json.contains(r#""profiles":["prod"]"#));

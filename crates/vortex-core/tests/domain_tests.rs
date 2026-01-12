@@ -62,14 +62,17 @@ fn test_config_value_workflow() {
         },
         "features": ["auth", "monitoring"]
     }"#;
-    
+
     let config = ConfigMap::from_json(json_config).expect("Failed to parse JSON");
 
     // 2. Verify typed access via dot notation
     assert_eq!(config.get("server.port").unwrap().as_i64(), Some(8000));
-    assert_eq!(config.get("server.host").unwrap().as_str(), Some("localhost"));
+    assert_eq!(
+        config.get("server.host").unwrap().as_str(),
+        Some("localhost")
+    );
     assert_eq!(config.get("app.enabled").unwrap().as_bool(), Some(true));
-    
+
     // Verify array access (requires manual traversing for now or specialized get)
     if let Some(features) = config.get("features").and_then(|v| v.as_array()) {
         assert_eq!(features.len(), 2);
@@ -80,7 +83,7 @@ fn test_config_value_workflow() {
 
     // 3. Create PropertySource wrapping the config
     let source = PropertySource::new("application.yml", config);
-    
+
     assert_eq!(source.name, "application.yml");
     assert!(!source.config.is_empty());
 }

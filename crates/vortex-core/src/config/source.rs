@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 pub struct PropertySource {
     /// The name of the property source (e.g., "application.yml").
     pub name: String,
-    
+
     /// The source origin details (e.g., URI, file path).
     /// Kept simple for now.
     #[serde(default)]

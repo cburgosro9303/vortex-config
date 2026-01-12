@@ -18,10 +18,10 @@ impl FormatParser for PropertiesFormat {
             if let Some((key, value)) = split_property_line(line) {
                 insert_nested(&mut root, key.trim(), value.trim());
             } else {
-                 return Err(VortexError::parse_error(
-                     "properties", 
-                     format!("Invalid syntax at line {}: missing separator", line_num + 1)
-                 ));
+                return Err(VortexError::parse_error(
+                    "properties",
+                    format!("Invalid syntax at line {}: missing separator", line_num + 1),
+                ));
             }
         }
 
@@ -34,11 +34,11 @@ impl FormatSerializer for PropertiesFormat {
         // Reuse the flattening logic from spring module if available,
         // or implement local flattening to ensure simple "key=value" output.
         // For properties, we generally want Dot Notation.
-        
+
         // We use the flatten function defined in `spring` module as it does exactly what we need:
         // transforms nested map into dot-notation flat map.
         use crate::format::spring::flatten_config_map;
-        
+
         let flat_map = flatten_config_map(config);
         let mut output = String::new();
 
@@ -49,13 +49,13 @@ impl FormatSerializer for PropertiesFormat {
                 ConfigValue::Bool(b) => b.to_string(),
                 ConfigValue::Integer(i) => i.to_string(),
                 ConfigValue::Float(f) => f.to_string(),
-                // Arrays and Objects shouldn't happen if flattened correctly, 
+                // Arrays and Objects shouldn't happen if flattened correctly,
                 // but if an array is a leaf, we print it as string representation for now
                 // or just skip. Spring Properties handling of arrays is complex (indices).
                 // MVP: Debug print
                 v => format!("{:?}", v),
             };
-            
+
             output.push_str(&format!("{}={}\n", key, val_str));
         }
 
@@ -65,7 +65,7 @@ impl FormatSerializer for PropertiesFormat {
 
 fn split_property_line(line: &str) -> Option<(&str, &str)> {
     // Split on first '=' or ':'
-    line.split_once(|c| c == '=' || c == ':')
+    line.split_once(['=', ':'])
 }
 
 fn insert_nested(root: &mut IndexMap<String, ConfigValue>, key: &str, value: &str) {
@@ -76,14 +76,14 @@ fn insert_nested(root: &mut IndexMap<String, ConfigValue>, key: &str, value: &st
 
     let parts: Vec<&str> = key.split('.').collect();
     let val = ConfigValue::String(value.to_string());
-    
+
     // Recursive insertion simulation using references
     // This is tricky with Rust ownership.
     // Easier approach: Recursive function or iterative pointer chase.
-    
+
     // Iterative approach to find/create the parent object
     let mut current_map = root;
-    
+
     for (i, part) in parts.iter().enumerate() {
         if i == parts.len() - 1 {
             // Last part: insert value
@@ -94,7 +94,7 @@ fn insert_nested(root: &mut IndexMap<String, ConfigValue>, key: &str, value: &st
                 .entry(part.to_string())
                 .and_modify(|v| {
                     if !matches!(v, ConfigValue::Object(_)) {
-                        // Conflict: key exists but is not an object. 
+                        // Conflict: key exists but is not an object.
                         // In properties logic, last write usually wins or merges.
                         // We overwrite with a new object to support the nesting.
                         *v = ConfigValue::Object(IndexMap::new());
@@ -116,7 +116,9 @@ fn insert_nested(root: &mut IndexMap<String, ConfigValue>, key: &str, value: &st
 
 fn escape_value(s: &str) -> String {
     // Basic escaping for .properties
-    s.replace('\n', "\\n").replace('\r', "\\r").replace('\t', "\\t")
+    s.replace('\n', "\\n")
+        .replace('\r', "\\r")
+        .replace('\t', "\\t")
 }
 
 #[cfg(test)]
@@ -131,12 +133,15 @@ mod tests {
         server.host: localhost
         app.name = Test App
         ";
-        
+
         let parser = PropertiesFormat;
         let config = parser.parse(input).unwrap();
 
         assert_eq!(config.get("server.port").unwrap().as_str(), Some("8080")); // Parsed as string by default
-        assert_eq!(config.get("server.host").unwrap().as_str(), Some("localhost"));
+        assert_eq!(
+            config.get("server.host").unwrap().as_str(),
+            Some("localhost")
+        );
         assert_eq!(config.get("app.name").unwrap().as_str(), Some("Test App"));
     }
 
@@ -144,10 +149,10 @@ mod tests {
     fn test_serialize_properties() {
         let json = r#"{"a": {"b": "c"}, "d": 10}"#;
         let config = ConfigMap::from_json(json).unwrap();
-        
+
         let serializer = PropertiesFormat;
         let output = serializer.serialize(&config).unwrap();
-        
+
         assert!(output.contains("a.b=c"));
         assert!(output.contains("d=10"));
     }

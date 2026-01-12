@@ -169,7 +169,7 @@ mod tests {
         let json = r#"{"key": "value", "num": 10.5}"#;
         // Directly deserialize into ConfigValue (as Object)
         let v: ConfigValue = serde_json::from_str(json).unwrap();
-        
+
         if let ConfigValue::Object(map) = v {
             assert_eq!(map.get("key").unwrap().as_str(), Some("value"));
             assert_eq!(map.get("num").unwrap().as_f64(), Some(10.5));
