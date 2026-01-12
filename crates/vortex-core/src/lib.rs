@@ -11,7 +11,10 @@
 //! - [`Result`]: Type alias for `Result<T, VortexError>`
 
 mod config;
+
 mod error;
+pub mod format;
+pub mod merge;
 mod types;
 
 // Re-export public types

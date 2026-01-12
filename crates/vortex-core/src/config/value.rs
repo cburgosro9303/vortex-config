@@ -7,6 +7,20 @@ use serde::{Deserialize, Serialize};
 /// This enum is the core building block for dynamic configuration structures.
 /// It supports recursive types (Arrays inside Objects, etc.) and uses `IndexMap`
 /// to preserve key order, which is crucial for configuration predictability.
+///
+/// # Example
+///
+/// ```
+/// use vortex_core::ConfigValue;
+/// use indexmap::IndexMap;
+///
+/// let val: ConfigValue = "hello".into();
+/// assert_eq!(val.as_str(), Some("hello"));
+///
+/// // Nested structure
+/// let arr: ConfigValue = vec![1, 2, 3].into();
+/// matches!(arr, ConfigValue::Array(_));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ConfigValue {

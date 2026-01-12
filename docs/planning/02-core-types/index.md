@@ -35,20 +35,21 @@ Esta épica es intensiva en el sistema de tipos de Rust.
 
 ### Nivel Avanzado
 
-| Concepto | Dónde se aplica | Explicación |
-|----------|-----------------|-------------|
-| **Zero-cost Abstractions** | Iteradores | Usar `map`, `filter`, `fold` compila a código ensamblador tan eficiente como un loop `for` manual. |
-| **Traits `From` / `TryFrom`** | Conversión de Tipos | Mecanismo estándar de Rust para convertir valores (ej. de JSON a nuestro tipo interno). |
-| **IndexMap vs HashMap** | `ConfigMap` | Por qué el Hashing estándar no garantiza orden y cuándo pagar el costo extra de mantener índices. |
+| Concepto                      | Dónde se aplica     | Explicación                                                                                             |
+|-------------------------------|---------------------|---------------------------------------------------------------------------------------------------------|
+| **Zero-cost Abstractions**    | Iteradores          | Usar `map`, `filter`, `fold` compila a código ensamblador tan eficiente como un loop `for` manual.      |
+| **Traits `From` / `TryFrom`** | Conversión de Tipos | Mecanismo estándar de Rust para convertir valores (ej. de JSON a nuestro tipo interno).                 |
+| **IndexMap vs HashMap**       | `ConfigMap`         | Por qué el Hashing estándar no garantiza orden y cuándo pagar el costo extra de mantener índices.       |
 
 ## 🛠 Historias de Usuario
 
-| ID | Título | Foco de Aprendizaje |
-|----|--------|---------------------|
-| [001](./story-001-configmap-serde.md) | **Jerarquía de Tipos con Serde** | Creación de Enums recursivos (`ConfigValue`), `IndexMap` y uso avanzado de Serde (`untagged`, `flatten`). |
-| [002](./story-002-property-source.md) | **Lógica de Merge Recursivo (Deep Merge)** | Implementación de algoritmos recursivos en Rust, manejo de Ownership (`clone` vs `borrow`) y referencias mutables. |
-| [003](./story-003-spring-format.md) | **Compatibilidad Spring Cloud** | Mapeo de estructuras complejas a formatos JSON específicos usando structs intermedios (DTO pattern). |
-| [004](./story-004-format-conversion.md) | **Conversión de Formatos (Properties/YAML)** | Implementación de Traits `From`/`Into` y manejo de errores de parsing. |
+| ID                                      | Título                                       | Foco de Aprendizaje                                                                                                                             |
+|-----------------------------------------|----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| [001](./story-001-configmap-serde.md)   | **Jerarquía de Tipos con Serde**             | Creación de Enums recursivos (`ConfigValue`), `IndexMap` y uso avanzado de Serde (`untagged`, `flatten`).                                       |
+| [002](./story-002-property-source.md)   | **Lógica de Merge Recursivo (Deep Merge)**   | Implementación de algoritmos recursivos en Rust, manejo de Ownership (`clone` vs `borrow`) y referencias mutables.                              |
+| [003](./story-003-spring-format.md)     | **Compatibilidad Spring Cloud**              | Mapeo de estructuras complejas a formatos JSON específicos usando structs intermedios (DTO pattern).                                            |
+| [004](./story-004-format-conversion.md) | **Conversión de Formatos (Properties/YAML)** | Implementación de Traits `From`/`Into` y manejo de errores de parsing.                                                                          |
+| [005](./story-005-core-testing.md)      | **Estrategia de Testing Core**               | Unit Tests vs Integration Tests, Fixtures compartidos y Documentation Tests.                                                                    |
 
 ## ✅ Criterios de Aceptación Globales
 
@@ -74,4 +75,5 @@ thiserror = "1.0"
 ```
 
 ---
-**Siguiente Paso**: Comenzar con la [Historia 001](./story-001-configmap-serde.md) para construir el motor de tipos.
+---
+**Siguiente Paso**: Completado. Ver [Reporte de Cierre](../../reviews/epic-02-review.md). Proceder con la Épica 03.
