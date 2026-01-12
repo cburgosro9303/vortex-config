@@ -1,18 +1,11 @@
-//! Vortex Server - HTTP server for Vortex Config
-//!
-//! This crate will provide the Axum-based HTTP server implementation.
+pub mod error;
+pub mod extractors;
+pub mod handlers;
+pub mod middleware;
+pub mod response;
+pub mod server;
 
-/// Returns the crate version.
-pub fn version() -> &'static str {
-    env!("CARGO_PKG_VERSION")
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn version_is_defined() {
-        assert!(!version().is_empty());
-    }
-}
+pub use handlers::health::HealthResponse;
+pub use handlers::response::ConfigResponse;
+pub use middleware::{LoggingLayer, REQUEST_ID_HEADER, RequestIdLayer};
+pub use server::{create_router, run_server};
