@@ -4,7 +4,15 @@
 
 El modelo de dominio de Vortex Config define los tipos fundamentales que representan la configuracion de aplicaciones. Estos tipos son el corazon del servidor y seran utilizados por todos los demas componentes.
 
+> **Contexto del PRD**: Los tipos definidos aquí son la base para las características avanzadas del servidor:
+>
+> - `ConfigMap` y `PropertySource` soportarán el sistema de **Configuration Inheritance & Composition** (cascading, override, merge-deep)
+> - Los tipos `Application`, `Profile`, `Label` formarán parte del `ResolutionContext` para el motor de herencia
+> - Las propiedades tendrán metadata para **PLAC** (Property-Level Access Control) y **property origin tracking**
+> - El modelo debe ser extensible para soportar `ConfigValue` con tipos variados (String, Integer, Boolean, List, Map)
+
 Inspirado en Spring Cloud Config, nuestro modelo incluye:
+
 - **ConfigMap**: Conjunto de propiedades para una aplicacion
 - **PropertySource**: Origen de configuracion con propiedades clave-valor
 - **Application**: Identificador de aplicacion
@@ -14,6 +22,7 @@ Inspirado en Spring Cloud Config, nuestro modelo incluye:
 ## Alcance
 
 ### In Scope
+
 - Definir structs para ConfigMap, PropertySource
 - Definir tipos para Application, Profile, Label
 - Implementar traits basicos (Clone, Debug, PartialEq)
@@ -22,6 +31,7 @@ Inspirado en Spring Cloud Config, nuestro modelo incluye:
 - Documentacion inline completa
 
 ### Out of Scope
+
 - Logica de negocio para cargar configuraciones
 - Validacion compleja de datos
 - Persistencia o serializacion a backends
@@ -99,6 +109,28 @@ ConfigMap {
     ],
 }
 ```
+
+> **Extensión futura (del PRD)**: En épicas posteriores, este modelo se extenderá para incluir:
+>
+> ```rust
+> // ResolutionContext para Configuration Inheritance (PRD 1.1)
+> pub struct ResolutionContext {
+>     pub organization: Option<String>,
+>     pub team: Option<String>,
+>     pub application: String,
+>     pub profile: String,
+>     pub label: String,
+>     pub instance_id: Option<String>,
+> }
+>
+> // PropertyOrigin para trazabilidad (PRD 1.1)
+> pub struct PropertyWithOrigin {
+>     pub key: String,
+>     pub value: String,
+>     pub origin: String,  // Ej: "application-production.yml"
+>     pub level: InheritanceLevel,
+> }
+> ```
 
 ## Pasos de Implementacion
 
@@ -219,9 +251,9 @@ impl Label {
 
 //! Configuration structures for Vortex Config.
 
-use crate::types::{Application, Label, Profile};
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+    use crate::types::{Application, Label, Profile};
+    use serde::{Deserialize, Serialize};
+    use std::collections::HashMap;
 
 /// A collection of configuration properties from a specific source.
 ///
@@ -902,7 +934,7 @@ fn test_complete_config_workflow() {
 
 ## Entregable Final
 
-### PR debe incluir:
+### PR debe incluir
 
 1. **Archivos nuevos/modificados:**
    - `crates/vortex-core/src/lib.rs` (actualizado)
@@ -927,6 +959,14 @@ fn test_complete_config_workflow() {
 - [ ] Ejemplos en doc comments compilan (`cargo test --doc`)
 - [ ] No hay warnings de clippy
 - [ ] Serialización JSON funciona correctamente
+
+## KPIs Asociados (del PRD)
+
+| Métrica | Objetivo | Relevancia para esta historia |
+|---------|----------|-------------------------------|
+| Memory footprint | < 30MB | Estructuras eficientes, sin overhead |
+| Latencia p99 | < 10ms | HashMap para O(1) property lookup |
+| Tiempo de serialización | < 1ms | Serde optimizado |
 
 ---
 

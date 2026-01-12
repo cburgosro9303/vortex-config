@@ -4,6 +4,8 @@
 
 Un pipeline de Integracion Continua (CI) es esencial para mantener la calidad del codigo en cualquier proyecto profesional. Para Vortex Config, implementaremos un pipeline en GitHub Actions que valide formateo, linting, tests y seguridad en cada push y pull request.
 
+> **Contexto del PRD**: El objetivo de CI es lograr un tiempo de pipeline < 5 minutos (KPI del proyecto). Además, este pipeline será la base para las pruebas de compatibilidad futuras con Spring Boot clients, tests de integración con backends (Git, S3, SQL), y tests de carga.
+
 Este pipeline es equivalente a lo que un desarrollador Java configuraria con GitHub Actions + Maven/Gradle, pero adaptado al ecosistema Rust.
 
 ## Alcance
@@ -32,8 +34,9 @@ Este pipeline es equivalente a lo que un desarrollador Java configuraria con Git
 - [ ] Job de tests ejecuta `cargo test --workspace`
 - [ ] Job de audit ejecuta `cargo audit`
 - [ ] Cache de Cargo configurado correctamente
-- [ ] Pipeline completo ejecuta en < 5 minutos
+- [ ] **Pipeline completo ejecuta en < 5 minutos** (KPI del PRD)
 - [ ] Badge de CI en README.md
+- [ ] MSRV check para Rust 1.92+
 
 ## Diseno Propuesto
 
@@ -605,13 +608,21 @@ cargo audit
 time cargo test --workspace  # Debe ser < 2 min
 ```
 
-### Métricas de CI
+## KPIs Asociados (del PRD)
 
-Después de algunos runs, verificar:
+| Métrica | Objetivo | Cómo este pipeline contribuye |
+|---------|----------|-------------------------------|
+| Tiempo de CI | < 5 min | Cache agresivo, jobs paralelos |
+| Build time (debug) | < 30s | Compilación incremental con cache |
+| Cobertura de tests | > 80% | Base para agregar cargo-llvm-cov |
+| Vulnerabilidades críticas | 0 | cargo audit en cada build |
 
-- Tiempo promedio de pipeline: < 5 minutos
-- Cache hit rate: > 80%
-- Tasa de fallos flaky: < 1%
+> **Preparación para futuras épicas**: Este pipeline será extendido para incluir:
+>
+> - Tests de compatibilidad con Spring Boot client (Épica 04)
+> - Tests de integración con backends Git/S3/SQL (Épica 06)
+> - Benchmarks de latencia p99 < 10ms (Épica 10)
+> - Builds de Docker con diferentes features (Épica 10)
 
 ## Entregable Final
 

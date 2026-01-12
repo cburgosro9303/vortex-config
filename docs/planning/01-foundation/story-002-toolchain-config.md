@@ -4,6 +4,13 @@
 
 Un proyecto Rust profesional requiere herramientas de calidad de código consistentes. Esta historia configura el toolchain de Rust y las herramientas de linting que garantizarán un código limpio, idiomático y mantenible.
 
+> **Contexto del PRD**: Las reglas de calidad establecidas aquí soportan los requisitos de Definition of Done del proyecto:
+>
+> - Sin `unwrap()` en código de producción (usar `expect()` o `?` operator)
+> - Errores tipados con `thiserror` (no strings)
+> - Logs estructurados con `tracing`
+> - Cobertura de tests > 80%
+
 Para un desarrollador Java, esto es equivalente a configurar:
 
 - **rustfmt** = Checkstyle / Google Java Format
@@ -114,6 +121,15 @@ allowed-scripts = ["Latin"]
 # MSRVs (Minimum Supported Rust Version)
 msrv = "1.92"
 ```
+
+> **Lints críticos para Vortex**: El PRD enfatiza que el código de producción NO debe usar `unwrap()`. Configurar el lint `clippy::unwrap_used` como `deny` en el crate level es recomendado:
+>
+> ```rust
+> // En lib.rs de cada crate
+> #![deny(clippy::unwrap_used)]
+> #![warn(clippy::pedantic)]
+> #![allow(clippy::module_name_repetitions)]
+> ```
 
 ### .cargo/config.toml
 
@@ -528,6 +544,14 @@ cargo clippy --workspace -- -D warnings
 
 echo "Todas las verificaciones pasaron!"
 ```
+
+## KPIs Asociados (del PRD)
+
+| Métrica | Objetivo | Cómo esta historia contribuye |
+|---------|----------|-------------------------------|
+| Warnings de compilación | 0 | clippy con `-D warnings` |
+| Cobertura de tests | > 80% | Base para métricas futuras |
+| Doc coverage | 100% items públicos | rustdoc configurado |
 
 ## Entregable Final
 
